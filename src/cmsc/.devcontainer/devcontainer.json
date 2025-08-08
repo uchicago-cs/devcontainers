@@ -1,0 +1,32 @@
+// .devcontainer/devcontainer.json
+{
+  "name": "UChicago CS DevContainer",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "username": "ubuntu",
+            "userUid": "1000",
+            "userGid": "1000",            
+            "upgradePackages": "true",
+            "installZsh": "false",
+            "installOhMyZsh": "false",
+            "installOhMyZshConfig": "false"
+        }       
+    },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+				"python.defaultInterpreterPath": "/usr/bin/python"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-vscode.cpptools"
+      ]
+    }
+  },
+  "remoteUser": "ubuntu"
+}
