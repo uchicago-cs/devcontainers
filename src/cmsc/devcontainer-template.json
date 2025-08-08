@@ -1,0 +1,13 @@
+{
+    "id": "cmsc",
+    "version": "0.1.0",
+    "name": "UChicago CS",
+    "description": "A devcontainer template for UChicago CS courses.",
+    "publisher": "University of Chicago - Department of Computer Science",
+    "documentationURL": "https://github.com/uchicago-cs/devcontainer/",
+    "licenseURL": "https://github.com/uchicago-cs/devcontainer//blob/main/LICENSE",
+    "options": {},
+    "platforms": [
+        "Python", "C", "C++"
+    ]
+}
