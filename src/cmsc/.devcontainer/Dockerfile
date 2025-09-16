@@ -17,6 +17,7 @@ RUN apt-get update; \
         lldb \
         llvm \
         gdb \
+        libcriterion-dev \
         # Python
         python3 \
         python3-pip \
@@ -24,5 +25,11 @@ RUN apt-get update; \
         python3-dev \
         # Git
         git \
+        # Utilities
+        vim \ 
+        tmux \
+        figlet \
+        imagemagick \
+        graphviz \
     ; \
     apt-get clean

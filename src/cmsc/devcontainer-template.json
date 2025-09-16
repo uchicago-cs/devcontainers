@@ -1,6 +1,6 @@
 {
     "id": "cmsc",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "name": "UChicago CS",
     "description": "A devcontainer template for UChicago CS courses.",
     "publisher": "University of Chicago - Department of Computer Science",
