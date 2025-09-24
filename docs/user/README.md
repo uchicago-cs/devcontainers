@@ -1,6 +1,6 @@
 # UChicago CS Dev Container - User Documentation
 
-This page describes how to install and use the UChicago CS Dev Container.
+This page describes how to install and use the UChicago CS Dev Container. We explain how to use the dev container from either VS Code or directly from a terminal.
 
 ## Software Prerequisites
 
@@ -20,7 +20,9 @@ To use the dev container in Visual Studio Code, first make sure that you have op
 
 ![VS Code - No folder message](vscode-nofolder.png)
 
-Then you need to open a folder first. You can do this by going to clicking on "Open Folder" and selecting the folder you want to open (this will typically be the root of a Git repository you are working)
+Then you need to open a folder first. You can do this by going to clicking on "Open Folder" and selecting the folder you want to open (this will typically be the root of a Git repository you are working on)
+
+You should also make sure that Docker is running before you try to set up or use any dev containers.
 
 ### Adding the Dev Container Configuration to Your Project
 
@@ -103,5 +105,26 @@ Clicking on "Reopenin Container" will reopen the directory inside the dev contai
 
 ## Using the Dev Container from the Command Line
 
-TODO
+To use the dev container from the command line, first navigate to the folder where you want to use the dev container. Dev containers refer to this directory as your "workspace", and it will typically be the root of a Git repository you are working on.
 
+To use the dev container, you will first need to add a series of configuration files to that directory. You can do so by running the following:
+
+```bash
+$ devcontainer templates apply -t "ghcr.io/uchicago-cs/devcontainers/cmsc" -w .
+```
+
+This will add a `.devcontainer/` directory with a series of configuration files. You can add those files to your Git repository, which can then make it easier to use and set up the dev container on other computers (however, you're note required to do so)
+
+Next, make sure that Docker is running on your computer. If it is, you can start the dev container by running this:
+
+```bash
+$ devcontainer up --workspace-folder .
+```
+
+The first time you do this, it may take a few minutes for the container to be built and started, as Docker will need to install all the required software. If you create additional CMSC dev containers (in other folders), they should start much faster once you've started the CMSC dev container at least one.
+
+The above two commands only need to be run **once** per workspace. After that, you can start a Linux terminal (inside the dev container) by running the following:
+
+```bash
+$ devcontainer exec --workspace-folder . bash 
+```
