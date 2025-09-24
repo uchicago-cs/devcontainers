@@ -27,9 +27,11 @@ RUN apt-get update; \
         git \
         # Utilities
         vim \ 
+        emacs \
         tmux \
         figlet \
         imagemagick \
         graphviz \
+        tldr \
     ; \
     apt-get clean
