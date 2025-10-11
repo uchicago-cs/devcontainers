@@ -6,6 +6,12 @@
     "context": "."
   },
   "postCreateCommand": "./.devcontainer/setup-extra.sh",
+  "containerEnv": {
+    "DISPLAY": "${localEnv:DISPLAY}"
+  },
+  "runArgs": [
+    "--volume", "/tmp/.X11-unix:/tmp/.X11-unix"
+  ],
   "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
             "username": "ubuntu",
@@ -29,5 +35,6 @@
       ]
     }
   },
-  "remoteUser": "ubuntu"
+  "remoteUser": "ubuntu",
+  "containerUser": "ubuntu"
 }
