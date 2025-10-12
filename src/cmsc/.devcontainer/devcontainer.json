@@ -10,7 +10,9 @@
     "DISPLAY": "${localEnv:DISPLAY}"
   },
   "runArgs": [
-    "--volume", "/tmp/.X11-unix:/tmp/.X11-unix"
+    "--volume", "/tmp/.X11-unix:/tmp/.X11-unix",
+    "--cap-add=SYS_PTRACE",
+    "--security-opt", "seccomp=unconfined"
   ],
   "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
