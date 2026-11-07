@@ -35,3 +35,9 @@ RUN apt-get update; \
         tldr \
     ; \
     apt-get clean
+
+# Bake the post-create script into the image so it does not depend on the
+# workspace copy (which may lose its execute bit, or not exist at all if the
+# configuration is stored in the user data folder)
+COPY setup-extra.sh /usr/local/bin/setup-extra.sh
+RUN chmod 755 /usr/local/bin/setup-extra.sh
