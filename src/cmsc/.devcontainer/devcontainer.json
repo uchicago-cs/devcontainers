@@ -5,7 +5,7 @@
     "dockerfile": "Dockerfile",
     "context": "."
   },
-  "postCreateCommand": "/usr/local/bin/setup-extra.sh",
+  "postCreateCommand": ["/usr/local/bin/setup-extra.sh", "${containerWorkspaceFolder}"],
   "containerEnv": {
     "DISPLAY": "${localEnv:DISPLAY}"
   },
