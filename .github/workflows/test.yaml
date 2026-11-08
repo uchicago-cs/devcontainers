@@ -42,11 +42,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Cache image layers in the GitHub Actions cache. The cache scope
+      # changes every week, so that the image is periodically rebuilt with
+      # the latest Ubuntu packages, as students' images are.
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v4
+
+      - name: "Expose GitHub runtime for the Buildx cache"
+        uses: crazy-max/ghaction-github-runtime@v4
+
+      - name: "Compute cache scope"
+        id: cache
+        run: echo "scope=${{ matrix.template }}-${{ runner.arch }}-$(date -u +%G-W%V)" >> "$GITHUB_OUTPUT"
+
       - name: "Install the Dev Container CLI"
         run: npm install -g @devcontainers/cli@0
 
       - name: "Build the dev container and run checks"
         run: ./test/run.sh "${{ matrix.template }}"
+        env:
+          DEVCONTAINER_CACHE_FROM: type=gha,scope=${{ steps.cache.outputs.scope }}
+          DEVCONTAINER_CACHE_TO: type=gha,scope=${{ steps.cache.outputs.scope }},mode=max
 
   test-projects:
     name: "test-projects (chirc, chitcp, chirouter, ${{ matrix.runner }})"
@@ -60,8 +76,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Same cache scope as the cmsc job in "test", so the two jobs share
+      # image layers
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v4
+
+      - name: "Expose GitHub runtime for the Buildx cache"
+        uses: crazy-max/ghaction-github-runtime@v4
+
+      - name: "Compute cache scope"
+        id: cache
+        run: echo "scope=cmsc-${{ runner.arch }}-$(date -u +%G-W%V)" >> "$GITHUB_OUTPUT"
+
       - name: "Install the Dev Container CLI"
         run: npm install -g @devcontainers/cli@0
 
       - name: "Build UChicago CS projects in the cmsc dev container"
         run: ./test/run.sh cmsc test-projects.sh
+        env:
+          DEVCONTAINER_CACHE_FROM: type=gha,scope=${{ steps.cache.outputs.scope }}
+          DEVCONTAINER_CACHE_TO: type=gha,scope=${{ steps.cache.outputs.scope }},mode=max

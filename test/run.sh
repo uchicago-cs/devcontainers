@@ -8,6 +8,13 @@
 # <test-script> defaults to test.sh
 #
 # Uses the devcontainer CLI if it is on the PATH, or runs it with npx otherwise.
+#
+# To use a BuildKit layer cache when building the image, set
+# DEVCONTAINER_CACHE_FROM and/or DEVCONTAINER_CACHE_TO, which are passed to
+# the devcontainer CLI's --cache-from and --cache-to options. For example,
+# "type=gha,scope=cmsc" and "type=gha,scope=cmsc,mode=max" in GitHub Actions.
+# Exporting a cache requires a buildx builder that supports it, such as one
+# using the docker-container driver.
 
 set -euo pipefail
 
@@ -54,8 +61,24 @@ find "$WORKSPACE/.devcontainer" -type f -exec chmod a-x {} +
 cp -r "$TEST_DIR" "$WORKSPACE/.test"
 cp "$REPO_ROOT/test/lib.sh" "$WORKSPACE/.test/"
 
+CACHE_ARGS=()
+if [ -n "${DEVCONTAINER_CACHE_FROM:-}" ]; then
+    CACHE_ARGS+=(--cache-from "$DEVCONTAINER_CACHE_FROM")
+fi
+if [ -n "${DEVCONTAINER_CACHE_TO:-}" ]; then
+    CACHE_ARGS+=(--cache-to "$DEVCONTAINER_CACHE_TO")
+fi
+if [ ${#CACHE_ARGS[@]} -gt 0 ]; then
+    # On Linux, the CLI runs a second "docker build" to change the remote
+    # user's UID to match the host user's. That build goes through the same
+    # cache-capable (docker-container) builder, which cannot see the image
+    # loaded by the first build, so it fails. Skip it, as Docker Desktop on
+    # macOS and Windows does.
+    CACHE_ARGS+=(--update-remote-user-uid-default never)
+fi
+
 echo "=== Building and starting the '$TEMPLATE' dev container"
-dc up --workspace-folder "$WORKSPACE"
+dc up --workspace-folder "$WORKSPACE" ${CACHE_ARGS[@]+"${CACHE_ARGS[@]}"}
 
 echo "=== Running $TEST_SCRIPT inside the container"
 dc exec --workspace-folder "$WORKSPACE" bash ".test/$TEST_SCRIPT"
