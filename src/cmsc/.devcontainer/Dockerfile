@@ -7,7 +7,7 @@ RUN apt-get update; \
 		ca-certificates \
 		curl \
 		wget \
-        # C/C**    
+        # C/C++    
         make \
         build-essential \
         cmake \

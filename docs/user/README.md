@@ -6,7 +6,7 @@ This page describes how to install and use the UChicago CS Dev Container. We exp
 
 To use the dev container, you will need to install [Docker](https://www.docker.com/) on your computer.
 
-- **macOS**: Install either [Collima](https://github.com/abiosoft/colima) or [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/).
+- **macOS**: Install either [Colima](https://github.com/abiosoft/colima) or [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/).
 - **Windows**: Install [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/). Please note that you must set it up to use the [WSL 2 backend](https://docs.docker.com/desktop/features/wsl/)
 - **Linux**: Install [Docker Engine](https://docs.docker.com/engine/install/). By default, you will need to use `sudo` to run Docker commands. If you want to run Docker commands without `sudo`, follow the instructions in the [Post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/) page.
 
@@ -95,13 +95,13 @@ If the terminal does not appear, you can open it by going to the menu and select
 
 ### Opening the Dev Container Again
 
-Once the dev container has been build and run for the first time, opening it again will be much faster.
+Once the dev container has been built and run for the first time, opening it again will be much faster.
 
 When you open your project in VS Code, you will see a pop-up in the bottom-right corner asking whether you want to "Reopen in Container":
 
 ![VS Code - Reopen in Container pop-up](vscode-suggest-reopen.png)
 
-Clicking on "Reopenin Container" will reopen the directory inside the dev container, and you will see the terminal for the container.
+Clicking on "Reopen in Container" will reopen the directory inside the dev container, and you will see the terminal for the container.
 
 ## Using the Dev Container from the Command Line
 
@@ -113,7 +113,7 @@ To use the dev container, you will first need to add a series of configuration f
 $ devcontainer templates apply -t "ghcr.io/uchicago-cs/devcontainers/cmsc" -w .
 ```
 
-This will add a `.devcontainer/` directory with a series of configuration files. You can add those files to your Git repository, which can then make it easier to use and set up the dev container on other computers (however, you're note required to do so)
+This will add a `.devcontainer/` directory with a series of configuration files. You can add those files to your Git repository, which can then make it easier to use and set up the dev container on other computers (however, you are not required to do so)
 
 Next, make sure that Docker is running on your computer. If it is, you can start the dev container by running this:
 
@@ -121,7 +121,7 @@ Next, make sure that Docker is running on your computer. If it is, you can start
 $ devcontainer up --workspace-folder .
 ```
 
-The first time you do this, it may take a few minutes for the container to be built and started, as Docker will need to install all the required software. If you create additional CMSC dev containers (in other folders), they should start much faster once you've started the CMSC dev container at least one.
+The first time you do this, it may take a few minutes for the container to be built and started, as Docker will need to install all the required software. If you create additional CMSC dev containers (in other folders), they should start much faster once you've started the CMSC dev container at least once.
 
 The above two commands only need to be run **once** per workspace. After that, you can start a Linux terminal (inside the dev container) by running the following:
 
