@@ -9,7 +9,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: "Check shell scripts"
         run: shellcheck -x src/*/.devcontainer/*.sh test/*.sh test/*/*.sh
@@ -21,7 +21,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -40,7 +40,7 @@ jobs:
           - ubuntu-latest      # x86_64
           - ubuntu-24.04-arm   # ARM (e.g., Apple Silicon Macs)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Cache image layers in the GitHub Actions cache. The cache scope
       # changes every week, so that the image is periodically rebuilt with
@@ -74,7 +74,7 @@ jobs:
           - ubuntu-latest      # x86_64
           - ubuntu-24.04-arm   # ARM (e.g., Apple Silicon Macs)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Same cache scope as the cmsc job in "test", so the two jobs share
       # image layers
