@@ -1,0 +1,98 @@
+name: "Test Dev Container Templates"
+on:
+  pull_request:
+  workflow_dispatch:
+  # Called by the release workflow before publishing
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: "Check shell scripts"
+        run: shellcheck -x src/*/.devcontainer/*.sh test/*.sh test/*/*.sh
+
+      - name: "Check template metadata is valid JSON"
+        run: for f in src/*/devcontainer-template.json; do jq empty "$f"; done
+
+  version-bump:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: "Check template versions were increased"
+        run: ./test/check-version-bump.sh "origin/${{ github.base_ref }}"
+
+  test:
+    name: "test (${{ matrix.template }}, ${{ matrix.runner }})"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        template:
+          - cmsc
+        runner:
+          - ubuntu-latest      # x86_64
+          - ubuntu-24.04-arm   # ARM (e.g., Apple Silicon Macs)
+    steps:
+      - uses: actions/checkout@v7
+
+      # Cache image layers in the GitHub Actions cache. The cache scope
+      # changes every week, so that the image is periodically rebuilt with
+      # the latest Ubuntu packages, as students' images are.
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v4
+
+      - name: "Expose GitHub runtime for the Buildx cache"
+        uses: crazy-max/ghaction-github-runtime@v4
+
+      - name: "Compute cache scope"
+        id: cache
+        run: echo "scope=${{ matrix.template }}-${{ runner.arch }}-$(date -u +%G-W%V)" >> "$GITHUB_OUTPUT"
+
+      - name: "Install the Dev Container CLI"
+        run: npm install -g @devcontainers/cli@0
+
+      - name: "Build the dev container and run checks"
+        run: ./test/run.sh "${{ matrix.template }}"
+        env:
+          DEVCONTAINER_CACHE_FROM: type=gha,scope=${{ steps.cache.outputs.scope }}
+          DEVCONTAINER_CACHE_TO: type=gha,scope=${{ steps.cache.outputs.scope }},mode=max
+
+  test-projects:
+    name: "test-projects (chirc, chitcp, chirouter, ${{ matrix.runner }})"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - ubuntu-latest      # x86_64
+          - ubuntu-24.04-arm   # ARM (e.g., Apple Silicon Macs)
+    steps:
+      - uses: actions/checkout@v7
+
+      # Same cache scope as the cmsc job in "test", so the two jobs share
+      # image layers
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v4
+
+      - name: "Expose GitHub runtime for the Buildx cache"
+        uses: crazy-max/ghaction-github-runtime@v4
+
+      - name: "Compute cache scope"
+        id: cache
+        run: echo "scope=cmsc-${{ runner.arch }}-$(date -u +%G-W%V)" >> "$GITHUB_OUTPUT"
+
+      - name: "Install the Dev Container CLI"
+        run: npm install -g @devcontainers/cli@0
+
+      - name: "Build UChicago CS projects in the cmsc dev container"
+        run: ./test/run.sh cmsc test-projects.sh
+        env:
+          DEVCONTAINER_CACHE_FROM: type=gha,scope=${{ steps.cache.outputs.scope }}
+          DEVCONTAINER_CACHE_TO: type=gha,scope=${{ steps.cache.outputs.scope }},mode=max

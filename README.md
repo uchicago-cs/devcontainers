@@ -10,7 +10,7 @@ ghcr.io/uchicago-cs/devcontainers/cmsc
 
 ## Dev Container Basics
 
-Dev Containers provide a simple mechanism for you to run a Linux environment on your personal computer, regardless of whether you are running Windows, macOS, or another Linux distrubution. 
+Dev Containers provide a simple mechanism for you to run a Linux environment on your personal computer, regardless of whether you are running Windows, macOS, or another Linux distribution. 
 
 If you are familiar with using the CS Linux Servers, you can think of a dev container as having your own personal Linux server running on your computer, but with a few key differences:
 
