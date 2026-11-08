@@ -23,6 +23,7 @@ RUN apt-get update; \
         python3-pip \
         python3-venv \
         python3-dev \
+        python-is-python3 \
         # Git
         git \
         # Utilities
