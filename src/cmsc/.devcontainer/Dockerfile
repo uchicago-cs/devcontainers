@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 
 # Install dependencies
-RUN apt-get update; \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         # Basic tools
 		ca-certificates \
@@ -34,8 +34,9 @@ RUN apt-get update; \
         imagemagick \
         graphviz \
         tldr \
-    ; \
-    apt-get clean
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Bake the post-create script into the image so it does not depend on the
 # workspace copy (which may lose its execute bit, or not exist at all if the
