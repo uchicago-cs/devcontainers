@@ -3,27 +3,8 @@
 # Checks for the cmsc dev container. Run inside the container, from the
 # workspace folder (test/run.sh takes care of this).
 
-set -u
-
-FAILURES=0
-
-# check <description> <command...>
-# Runs the command, and prints its output only if it fails.
-check() {
-    local desc="$1"
-    shift
-    local output
-    if output=$("$@" 2>&1); then
-        echo "PASS: $desc"
-    else
-        echo "FAIL: $desc"
-        while IFS= read -r line; do echo "    $line"; done <<< "$output"
-        FAILURES=$((FAILURES + 1))
-    fi
-}
-
-TMP="$(mktemp -d)"
-trap 'sudo rm -rf "$TMP"' EXIT
+# shellcheck source=test/lib.sh
+source "$(dirname "$0")/lib.sh"
 
 ### User and setup script
 
@@ -65,6 +46,14 @@ check "g++ compiles and runs a C++ program" \
     bash -c "g++ -o '$TMP/hello-cpp' '$TMP/hello.cpp' && '$TMP/hello-cpp'"
 check "Criterion tests compile, link, and run" \
     bash -c "gcc -o '$TMP/criterion' '$TMP/criterion.c' -lcriterion && '$TMP/criterion'"
+# Ubuntu's Criterion 2.4.1 breaks chiTCP's tests, so we build 2.4.3 ourselves
+# shellcheck disable=SC2016  # $(...) should expand in the inner shell
+check "Criterion is version 2.4.3" \
+    bash -c 'test "$(pkg-config --modversion criterion)" = 2.4.3'
+check "Ubuntu's Criterion package is not installed" \
+    bash -c '! dpkg -s libcriterion-dev >/dev/null 2>&1'
+check "protobuf-c compiler and library are installed" \
+    bash -c 'command -v protoc-c && test -f /usr/include/protobuf-c/protobuf-c.h'
 check "valgrind runs a program" \
     valgrind --error-exitcode=1 -q "$TMP/hello"
 
@@ -97,6 +86,8 @@ print(json.load(sys.stdin)["customizations"]["vscode"]["settings"]["python.defau
     test -x "$path"
 }
 check "VS Code's python.defaultInterpreterPath exists" interpreter_path_exists
+check "Python packages for chirc tests are installed" \
+    python -c 'import pytest, pytest_jsonreport, click'
 
 ### Git
 
@@ -115,9 +106,4 @@ root_owned_repo_works_after_setup() {
 check "git works in a root-owned repository after setup-extra.sh" \
     root_owned_repo_works_after_setup
 
-echo
-if [ "$FAILURES" -gt 0 ]; then
-    echo "$FAILURES check(s) failed"
-    exit 1
-fi
-echo "All checks passed"
+finish

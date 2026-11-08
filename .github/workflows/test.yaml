@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: "Check shell scripts"
-        run: shellcheck src/*/.devcontainer/*.sh test/*.sh test/*/*.sh
+        run: shellcheck -x src/*/.devcontainer/*.sh test/*.sh test/*/*.sh
 
       - name: "Check template metadata is valid JSON"
         run: for f in src/*/devcontainer-template.json; do jq empty "$f"; done
@@ -43,3 +43,15 @@ jobs:
 
       - name: "Build the dev container and run checks"
         run: ./test/run.sh "${{ matrix.template }}"
+
+  test-projects:
+    name: "test-projects (chirc, chitcp, chirouter)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Install the Dev Container CLI"
+        run: npm install -g @devcontainers/cli@0
+
+      - name: "Build UChicago CS projects in the cmsc dev container"
+        run: ./test/run.sh cmsc test-projects.sh

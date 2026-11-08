@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
 
-# Builds a dev container from a template in src/ and runs that template's
-# checks (test/<template>/test.sh) inside it.
+# Builds a dev container from a template in src/ and runs one of that
+# template's test scripts (test/<template>/<test-script>) inside it.
 #
-# Usage: test/run.sh <template-id>
+# Usage: test/run.sh <template-id> [<test-script>]
+#
+# <test-script> defaults to test.sh
 #
 # Uses the devcontainer CLI if it is on the PATH, or runs it with npx otherwise.
 
 set -euo pipefail
 
-TEMPLATE="${1:?usage: $0 <template-id>}"
+TEMPLATE="${1:?usage: $0 <template-id> [<test-script>]}"
+TEST_SCRIPT="${2:-test.sh}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC_DIR="$REPO_ROOT/src/$TEMPLATE"
 TEST_DIR="$REPO_ROOT/test/$TEMPLATE"
 
-if [ ! -d "$SRC_DIR/.devcontainer" ] || [ ! -f "$TEST_DIR/test.sh" ]; then
-    echo "error: expected $SRC_DIR/.devcontainer and $TEST_DIR/test.sh" >&2
+if [ ! -d "$SRC_DIR/.devcontainer" ] || [ ! -f "$TEST_DIR/$TEST_SCRIPT" ]; then
+    echo "error: expected $SRC_DIR/.devcontainer and $TEST_DIR/$TEST_SCRIPT" >&2
     exit 1
 fi
 
@@ -49,9 +52,10 @@ cp -r "$SRC_DIR/.devcontainer" "$WORKSPACE/"
 find "$WORKSPACE/.devcontainer" -type f -exec chmod a-x {} +
 
 cp -r "$TEST_DIR" "$WORKSPACE/.test"
+cp "$REPO_ROOT/test/lib.sh" "$WORKSPACE/.test/"
 
 echo "=== Building and starting the '$TEMPLATE' dev container"
 dc up --workspace-folder "$WORKSPACE"
 
-echo "=== Running checks inside the container"
-dc exec --workspace-folder "$WORKSPACE" bash .test/test.sh
+echo "=== Running $TEST_SCRIPT inside the container"
+dc exec --workspace-folder "$WORKSPACE" bash ".test/$TEST_SCRIPT"
