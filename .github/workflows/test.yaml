@@ -29,12 +29,16 @@ jobs:
         run: ./test/check-version-bump.sh "origin/${{ github.base_ref }}"
 
   test:
-    runs-on: ubuntu-latest
+    name: "test (${{ matrix.template }}, ${{ matrix.runner }})"
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
         template:
           - cmsc
+        runner:
+          - ubuntu-latest      # x86_64
+          - ubuntu-24.04-arm   # ARM (e.g., Apple Silicon Macs)
     steps:
       - uses: actions/checkout@v4
 
@@ -45,8 +49,14 @@ jobs:
         run: ./test/run.sh "${{ matrix.template }}"
 
   test-projects:
-    name: "test-projects (chirc, chitcp, chirouter)"
-    runs-on: ubuntu-latest
+    name: "test-projects (chirc, chitcp, chirouter, ${{ matrix.runner }})"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - ubuntu-latest      # x86_64
+          - ubuntu-24.04-arm   # ARM (e.g., Apple Silicon Macs)
     steps:
       - uses: actions/checkout@v4
 
