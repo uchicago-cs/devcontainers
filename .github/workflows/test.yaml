@@ -1,0 +1,45 @@
+name: "Test Dev Container Templates"
+on:
+  pull_request:
+  workflow_dispatch:
+  # Called by the release workflow before publishing
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Check shell scripts"
+        run: shellcheck src/*/.devcontainer/*.sh test/*.sh test/*/*.sh
+
+      - name: "Check template metadata is valid JSON"
+        run: for f in src/*/devcontainer-template.json; do jq empty "$f"; done
+
+  version-bump:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Check template versions were increased"
+        run: ./test/check-version-bump.sh "origin/${{ github.base_ref }}"
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template:
+          - cmsc
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Install the Dev Container CLI"
+        run: npm install -g @devcontainers/cli@0
+
+      - name: "Build the dev container and run checks"
+        run: ./test/run.sh "${{ matrix.template }}"
